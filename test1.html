@@ -1,0 +1,383 @@
+
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<link href="./default.css" rel="stylesheet" type="text/css" media="all" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.2.0/split.min.js"></script>
+<script type="text/javascript" src='split.js'></script>
+
+<!-- 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/github.min.css">
+ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/highlight.min.js"></script>
+
+<script src="utils.js"></script>
+
+</head>
+
+<!--
+TODO
+
+-fichiers
+
+-affichage code
+
+-load/save sur serveur VS fichier javascript ????
+
+-->
+ 
+<body>
+
+    <div class="container">
+        <div class="api">
+		  <!-- LEFT PANE START -->
+          <div id="three" class="split split-horizontal">
+		  <h3> Add content </h3>
+            <p>
+				<div class="addContentHead">
+				
+				Entry name <input type="text" id="newEntry" name="newEntry" value=""><br /></br>
+				
+				<button type="button" onclick="addFields()">Add entry</button>
+				</div>
+
+				
+				
+				<div id="addContentContainer"/>The organizer is void.</div>
+				
+				<script type='text/javascript'>
+					//the id of the entry and the entryName never changes, but to the user is shown the value of the title textarea
+					var currentModified = -1;
+					var nEntries = 0;
+					var addEntries = [];
+					var clickLink = -1;
+					
+					function addFields(){
+						if (document.getElementById("newEntry").value){
+							// addContentContainer <div> where dynamic content will be placed
+							var addContentContainer = document.getElementById("addContentContainer");
+							// Clear previous contents of the addContentContainer
+							while (addContentContainer.hasChildNodes()) {
+									addContentContainer.removeChild(addContentContainer.lastChild);
+								}
+							/*
+							if(nEntries == 0){
+								console.log("FLUSH");
+								while (addContentContainer.hasChildNodes()) {
+									addContentContainer.removeChild(addContentContainer.lastChild);
+								}
+							}*/
+							
+							var entryName = document.getElementById("newEntry").value;
+							var entryId = "e"+nEntries;
+							
+							var $divtext = $("<div>");
+							$("#addContentContainer").append($divtext);
+								$divtext.append("</br>");
+								var $thisdiv = $("<div class='entryText' id='div" + nEntries + "'>");
+								$divtext.append($thisdiv);
+									//$thisdiv.append("<p>"+entryName+"</br>");//title of entry
+									$thisdiv.append("<div id='divfieldname'>Title</div>");
+									var input = document.createElement("textarea");
+									input.type = "text";
+									input.maxLength = 30;
+									input.value = entryName;
+									input.name = entryName;
+									input.className = "titleArea";
+									input.id = "addTitle";
+									$thisdiv.append(input);
+									//$thisdiv.append("</br>");
+									//
+									$thisdiv.append("<div id='divfieldname'>Short description</div>");
+									var input = document.createElement("textarea");
+									input.type = "text";
+									input.name = entryName;
+									input.className = "shortArea";
+									input.id = "addShort";
+									$thisdiv.append(input);
+									//$thisdiv.append("</br>");
+									//
+									$thisdiv.append("<div id='divfieldname'>Long description</div>");
+									var input = document.createElement("textarea");
+									input.type = "text";
+									input.name = entryName;
+									input.className = "longArea";
+									input.id = "addLong";
+									$thisdiv.append(input);
+									//
+									$thisdiv.append("<div id='divdocuments'>Documents</div>");
+									var filenameInput = document.createElement('input');
+									filenameInput.type= "file";
+									filenameInput.id = "addInput";
+									$thisdiv.append(filenameInput);
+									filenameInput.addEventListener('change', readSingleFile, false);
+									//
+									var thisEntry = new Entry();
+									thisEntry.id = nEntries;
+									thisEntry.title = entryName;
+									addEntries.push(thisEntry);
+									console.log("pushed 0 " + thisEntry.title + " " + addEntries[0].title);
+									//
+									var $linker = $('<input type="button" value="Link to/unlink from" class="linkButton">');
+									$linker.attr("id","link"+nEntries);
+									$thisdiv.append($linker);
+									//
+									//$thisdiv.append("</p>");
+									var $rem = $('<input type="button" value="Remove entry" class="removeButton">');
+									$rem.attr("id","rem"+nEntries);
+									$thisdiv.append($rem);
+									//
+								$divtext.append("</div>"); //end thisdiv
+							var divtext2 = "</div> ";
+							$("#addContentContainer").append(divtext2);
+							//remove click
+							$rem.click(function(){
+								flushCurrent();
+								addEntries[currentModified].alive = false;
+								var d = document.getElementById("drag"+currentModified);
+								d.style.visibility = 'hidden';
+								document.getElementById("addTitle").value = "";
+								for (var i = connectors.length-1; i > -1; i=i-1) {
+									if(connectors[i].from == currentModified || connectors[i].to == currentModified){
+										connectors.splice(i,1);
+									}
+								}
+								currentModified = -1;
+							});
+							$linker.click(function(){
+								clickLink = currentModified;
+							});
+							currentModified = nEntries;
+							nEntries += 1;
+							document.getElementById("newEntry").value = "";
+						} // end if value
+						
+					}//end addfields
+					<!-- call addFields if enter is pressed -->
+					$(document).keypress(function(e) {
+						if(e.which == 13 && document.getElementById("newEntry").value) {
+							addFields();
+						}
+					});
+				</script>
+			</p>
+          </div>
+		  <!-- LEFT PANE END -->
+		  <!-- RIGHT PANE START -->
+          <div id="four" class="split split-horizontal">
+		  <h3>View</h3>
+            <div id="wrap">
+				<canvas id="canvas" width="600" height="600"></canvas>
+				<div id="viewContainer"/></div>
+				<script>
+				/*
+					function refreshAddEntries(){
+						var i;
+						for (i = 0; i < addEntries.length; ++i) {
+							if(typeof $("#div"+i) != 'undefined'){
+								var entry = addEntries[i];
+								if(i!=entry.i){alert("problem");}
+								if(i==0){
+								console.log("refreshing title " + i + " " + $("#title"+i).value);}
+								entry.title = $("#title"+i).value;
+								entry.shortDescr = $("#short"+i).value;
+								entry.longDescr = $("#short"+i).value;
+							}
+							else{console.log("noentry " + i);}
+						}
+					}
+					*/
+					var canvas = document.getElementById("canvas");
+					var ctx = canvas.getContext("2d");
+					canvas.width = window.innerWidth;
+					canvas.height = window.innerHeight;
+					ctx.lineWidth = 1;
+					var connectors = [];
+					function connect() {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						for (var i = 0; i < connectors.length; i++) {
+							var c = connectors[i];
+							$eFrom = $("#drag"+c.from);
+							$eTo = $("#drag"+c.to);
+							/*
+							for(var key in $eFrom) {
+								console.log('key: ' + key + '\n' + 'value: ' + $eFrom[key]);
+							}*/
+							var pos1 = $eFrom.position();
+							var pos2 = $eTo.position();
+							//
+							var fromPosX = pos1.left + $eFrom.width() / 2;
+							var fromPosY = pos1.top;
+							var toPosX = pos2.left + $eTo.width() / 2;
+							var toPosY = pos2.top + $eTo.height() + 10;
+							//
+							var dy = (toPosY-fromPosY)/2;
+							if(dy > 0){//go down
+								fromPosX = pos1.left + $eFrom.width();
+								fromPosY = pos1.top + $eFrom.height();
+								toPosY = pos2.top - 2;
+								toPosX = pos2.left + $eTo.width() + 2;
+								ctx.beginPath();
+								ctx.moveTo(fromPosX,fromPosY);
+								ctx.lineTo(toPosX,toPosY);
+							}
+							else{
+								ctx.beginPath();
+								ctx.moveTo(fromPosX,fromPosY);
+								ctx.lineTo(fromPosX,fromPosY+dy);//vert
+								ctx.lineTo(toPosX,fromPosY+dy);//horiz
+								ctx.lineTo(toPosX,toPosY);//vert
+							}
+							//ctx.lineTo(toPosX,toPosY);
+							ctx.stroke();
+							ctx.closePath();
+							ctx.beginPath();
+							ctx.arc(toPosX,toPosY, 6, 0, 2 * Math.PI);
+							ctx.closePath();
+							ctx.fill();
+						}//end for
+					}// end connect
+					//
+					function clickdname(){
+						var i = this.id.replace("dname","");
+						if(clickLink!=-1){
+							if(i != clickLink){
+								var already = -1;
+								for (k = 0; k < connectors.length; ++k) {
+									if(connectors[k].from == clickLink && connectors[k].to == i){
+										already = k;
+										break;
+									}
+								}
+								if(already>-1){
+									connectors.splice(k,1);
+								}
+								else{
+									connectors.push({
+												from: clickLink,
+												to: i
+									});
+								}
+								connect();
+								clickLink = -1;
+							}
+						}
+						else{
+							currentModified = i;
+							var title = document.getElementById("addTitle");
+							var shortd = document.getElementById("addShort");
+							var longd = document.getElementById("addLong");
+							//
+							entry = addEntries[i];
+							title.value = entry.title;
+							shortd.value = entry.shortDescr;
+							longd.value = entry.longDescr;
+						}
+						
+					}
+					//
+					function refreshCurrent(){
+						if (currentModified>-1){
+							var title = document.getElementById("addTitle").value;
+							var shortDescr = document.getElementById("addShort").value;
+							var longDescr = document.getElementById("addLong").value;
+							var entry = addEntries[currentModified];
+							title = title.replace(/\r?\n/g, '<br />');
+							shortDescr = shortDescr.replace(/\r?\n/g, '<br />');
+							longDescr = longDescr.replace(/\r?\n/g, '<br />');
+							entry.title = title;
+							entry.shortDescr = shortDescr;
+							entry.longDescr = longDescr;
+						}
+					}
+					//
+					function flushCurrent(){
+						if (currentModified>-1){
+							var title = document.getElementById("addTitle").value;
+							var shortDescr = document.getElementById("addShort").value;
+							var longDescr = document.getElementById("addLong").value;
+							title = "";
+							shortDescr = "";
+							longDescr = "";
+						}
+					}
+					//
+					var shown = [];
+					$vc = $("#viewContainer");
+					function refreshDraggers(){
+						refreshCurrent();
+						connect();
+						for (i=0; i<nEntries; i++){
+							var element = document.getElementById("addTitle");
+							if(element){
+								var already = shown.indexOf(i)!=-1;
+								if(already){
+									var entry = addEntries[i];
+									$("#dname"+i).html(entry.title);
+									//var shortDescr = document.getElementById("addShort");
+									//$("#dshort"+i).text(shortDescr.value);
+									$("#dshort"+i).html(entry.shortDescr);
+									//var longDescr = document.getElementById("addLong");
+									$("#dlong"+i).html(entry.longDescr);
+								}
+								else{
+									console.log("create element drag" + i);
+									//
+									var app = document.createElement("div");
+									app.id = "drag" + i;
+									app.className = "dragstep";
+									//
+									var dname = document.createElement("a");
+									dname.id = "dname" + i;
+									dname.className = "dname";
+									//dname.href = "dref" + i;
+									dname.onclick = clickdname;
+									app.append(dname);
+									//
+									var descr = document.createElement("div");
+									descr.id = "dshort" + i;
+									descr.className = "dshortDescr";
+									app.append(descr);
+									//
+									var descr = document.createElement("div");
+									descr.id = "dlong" + i;
+									descr.className = "dlongDescr";
+									app.append(descr);
+									//
+									$vc.append(app);
+									$app = $("#drag"+i);
+									//$vc.append($app);
+									//$("#canvas").append($app);
+									shown.push(i);
+									$app.mousedown(handle_mousedown);
+									$app.mousemove(connect);
+									//$app.on('dragged', connect);
+								}
+							}
+						}
+						setTimeout(refreshDraggers, 100); //100 pour debug, 500 pour public
+					}
+					refreshDraggers();
+				</script>
+			</div>
+          </div>
+		  <!-- RIGHT PANE START -->
+        </div>
+    </div>
+
+	<script src="../split.js"></script>
+	
+	<script>
+		var split = Split(['#three', '#four'], {
+			sizes: [30, 70],
+			minSize: 350,
+		});
+	</script>
+
+	
+
+</body>
+
+
+

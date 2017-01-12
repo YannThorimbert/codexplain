@@ -1,0 +1,136 @@
+
+
+#addContentContainer{
+
+}
+
+.addContentHead{
+
+	padding: 10px;
+	margin: auto;
+}
+
+.entryText{
+	/* margin: 20px; */
+	padding: 4px;
+	border: 1px solid;
+	border-radius: 5px;
+	background-color: cyan;
+}
+
+.titleArea{
+	color: blue;
+	font-size: 1.2em;
+	width: 60%;
+	height: 2em;
+}
+
+.shortArea{
+	color: red;
+	font-size: 1.em;
+	width: 60%;
+	height: 80px;
+}
+
+.longArea{
+	color: green;
+	font-size: 1.em;
+	width: 60%;
+	height: 80px;
+}
+
+.removeButton{
+	color: red;
+}
+
+.dragstep{
+	color: blue;
+	border-radius: 3px;
+	background-color: cyan;
+	display: inline-block;  
+	padding: 2px;
+	font-size: 1.5em;
+	border: 1px solid;
+}
+
+.dname{
+	text-align: center;
+}
+
+.dshortDescr{
+	color: black;
+	font-size: 0.8em;
+	border-radius: 3px;
+	border: 1px solid;
+	padding: 4px;
+}
+
+.dlongDescr{
+	color: black;
+	font-size: 0.6em;
+	border-radius: 3px;
+	border: 1px solid;
+	padding: 4px;
+}
+
+.dragstep:hover{
+cursor: hand;
+}
+
+#viewContainer{
+	/* background-color:yellow; */
+	position:absolute;
+	top:0;
+	left:0;
+}
+
+#wrap { position:relative } /* Make this a positioned parent */
+
+#canvas{
+	background-color:blue;
+}
+
+
+
+/* .docButton{
+	float:right;
+} */
+
+
+/* split.js */
+
+	  
+.api {
+	height: 95%;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+
+}
+.split p {
+	padding: 10px;
+}
+.split {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+.gutter {
+	background-color: #eee;
+	background-repeat: no-repeat;
+	background-position: 50%;
+}
+.gutter.gutter-horizontal {
+	background-image: url('../grips/vertical.png');
+	cursor: ew-resize;
+}
+.gutter.gutter-vertical {
+	background-image: url('../grips/horizontal.png');
+	cursor: ns-resize;
+}
+.split.split-horizontal, .gutter.gutter-horizontal { /*barre de slide */
+	height: 100%;
+	float: left;
+}
+
